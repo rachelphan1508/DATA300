@@ -1,0 +1,53 @@
+---
+title: "HanhPhan_DATA300_Lab2"
+output: html_document
+---
+PART 1:
+
+Use the c (combination) function to create a vector of elements 3, 5, 7, 11, 13
+```{r}
+myvector <- c(3, 5, 7, 11, 13)
+myvector
+
+```
+Calculate the mean of the numbers using the mean() function
+```{r}
+mean(myvector)
+```
+Get the number of elements in the vector using the length() function
+```{r}
+length(myvector)
+```
+
+
+
+PART 2:
+
+Import the dataset in the csv file and name it "mydata"
+```{r}
+mydata <- read.csv("traffic_survey_data.csv")
+mydata
+```
+Print the car type of everyone who took the survey. The list is named car_list
+```{r}
+car_list <- mydata$cartype
+car_list
+```
+Calculate the mean age of people who took the survey. Use na.rm to remove the NA values.
+```{r}
+mean_age <- mean(mydata$age,na.rm=TRUE)
+mean_age
+```
+
+Summarize the age and education level of people who took the survey using the summary() function
+```{r}
+summary(mydata$age)
+summary(mydata$education)
+```
+
+Get the total number of people who took the survey by getting the number of rows in the dataset
+```{r}
+num_pp <- nrow(mydata)
+num_pp
+```
+

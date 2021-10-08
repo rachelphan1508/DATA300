@@ -1,0 +1,80 @@
+---
+title: "DATA300_Lab5_HanhPhan"
+output: html_document
+---
+
+Part 1:
+The percentage of covid hospitalizations was relatively small among all counties. There was no clear relationship between covid hospitalizations and change in two-party vote percentage.
+
+
+```{r}
+library(ggplot2)
+
+mydata <- read.csv("ohio_election_data.csv")
+
+#calculate the % change in votes for Trump
+mydata$total_2016 <- mydata$trump_votes2016 + mydata$clinton_votes2016
+mydata$total_2020 <- mydata$trump_votes2020 + mydata$biden_votes2020
+mydata$trump_change <- mydata$trump_votes2020/mydata$total_2020*100 - mydata$trump_votes2016/ mydata$total_2016*100
+
+#calculate the % of covid hospitality
+mydata$percent_covid_hosp <- mydata$covid_hosp / mydata$Population
+
+#create a new variable for the winning party in 2020
+mydata$more_votes_2020 <- ifelse(mydata$trump_votes2020>mydata$biden_votes2020,"Republican","Democrat")
+
+#customize color for Democrat and Republican by using scale_color_manual
+G <- ggplot(data=mydata,mapping=aes(x=percent_covid_hosp,y=trump_change, size = Population)) + geom_point(aes(color=more_votes_2020)) + scale_color_manual(values = c("#0015BC", "#DE0100")) + geom_smooth(size=1.1, color="#00a6c7", se=FALSE)
+
+#add labels to the plot
+G <- G + labs(title = "Covid Hospitalizations and Change in Votes for Trump, by County", x="% of Covid Hospitalization", y = "% Change in Votes to Trump", color="Winning Party in 2020" ) + theme(plot.title = element_text(face="bold"))
+
+G
+
+
+
+```
+
+
+
+Part 2:
+There was no clear relationship between covid hospitalizations and the change in number of people who voted. 
+
+```{r}
+
+#calculate the % of total vote changes between 2016 and 2020
+mydata$vote_change <- (mydata$total_2020 -  mydata$total_2016)/mydata$total_2016*100
+
+#make the plot with x,y axes and two indicators (size: population, color: changes in votes for Trump)
+G2 <- ggplot(data=mydata,mapping=aes(x=percent_covid_hosp,y=vote_change, color = trump_change, size = Population)) + geom_point() + geom_smooth(size=1.1, color="#00a6c7", se= FALSE)
+
+#set gradient between two colors to show the % change in Trump's votes
+G2 <- G2 + scale_color_gradient(low="#faf0f0", high="#c70000")
+
+#add the label names
+G2 <- G2 + labs(title = "Covid Hospitalizations and Turnout, by County", x="% of Covid Hospitalization", y = "% Change in Votes", color="% that went to Trump in 2020" ) + theme(plot.title = element_text(face="bold"))
+
+G2
+
+```
+
+
+
+Part 3:
+It's notable that on average countries that didn't experience civil wars have higher GDP per capita than countries that experienced civil wars. GDP per capita in some countries without civil wars was unstable, but most tended to go up. GDP per capita in countries that experienced civil wars was overall increasing slowly over time. 
+```{r}
+df <- read.csv("world_bank.csv")
+
+#create the plot with Time as the X-axis and GDP as the Y-axis. Show the change in time by grouping the country.
+G3 <- ggplot(data=df,mapping=aes(x=Time,y=gdp)) + geom_line(color="gray55", aes(group=Country.Name)) + geom_smooth(size= 1.1, method ="loess",se=FALSE, color ="#00a6c7" ) 
+
+#break into 2 facets, assign label names to civil war values
+cw.labs <- c("0" = "Without Civil War", "1" = "With Civil War")
+G3 <- G3 + facet_wrap(~civilwar, ncol=2, labeller = labeller(.default = cw.labs)) + theme(strip.text.x = element_text(size = 12, face = "bold"))
+
+#add the label names
+G3 <- G3 + labs(x = "Year", y="GDP per capita (thousand dollar)", title="GDP per capita on countries with and without Civil War")+ theme(plot.title = element_text(face="bold"))
+G3
+```
+
+

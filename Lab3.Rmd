@@ -1,0 +1,47 @@
+---
+title: "DATA300_LAB3_HanhPhan"
+output: html_document
+---
+```{r}
+mydata <- read.csv("dataset.csv")
+
+```
+
+Part 1
+Run through every value in cartype, if the value is blank, replace it with "no car", otherwise just keep it the same as it was.
+```{r}
+mydata$cartype <- ifelse(mydata$cartype=="","no car",mydata$cartype)
+```
+
+Part 2
+Create a new variable called independent. If the respondent is not Democrat (democrat=0) and not Republican (GOP=0), then set the independent value to 1, otherwise set it to 0
+
+```{r}
+mydata$independent <- ifelse(mydata$democrat==0 & mydata$GOP==0,1,0)
+mydata$independent
+summary(mydata)
+```
+Part 3
+Drop the subjectid column and change the column names to be informative
+Use stargazer to create a table of summary statistics.
+```{r results="asis"}
+library(stargazer)
+
+drop <- c("subjectid")
+df = mydata[,!(names(mydata)%in%drop)]
+colnames(df) <- c("Cartype","Education","Age","Urban","Married","Kids","Black","Female","Democrat","GOP","Bush Approval","Independent")
+
+stargazer(df, type="html",title="Traffic Survey Data - Summary Statistic Table", column.sep.width = "15pt")
+
+
+```
+Part 4:
+Create a table of 2 variables: cartype and bushapproval.
+The table shows that most people who pickup seem to support President Bush (144 supported and 61 didn't). Approximately a half of car, no car, and SUV drivers supported President Bush and the other half didn't.
+
+```{r}
+table(mydata$cartype, mydata$bushapproval)
+```
+
+
+
