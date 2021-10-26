@@ -1,0 +1,55 @@
+---
+title: "DATA300_Lab6_HanhPhan"
+output: html_document
+---
+Part 1: Treaty Signature Status
+
+According to the dataset, most countries have ratified the treaty. It's more common for countries that ratified the treaty to have a law against gender discrimination.
+
+```{r}
+library(ggplot2)
+mydata <- read.csv("gender_equality.csv")
+
+#change the variable type to factor
+mydata$discrimination_illegal <- as.factor(mydata$discrimination_illegal)
+
+#create the plot with "treaty" as bars and "discrimination_illegal" as an indicator
+#manually recolor the plot
+g <- ggplot(data=mydata, mapping=aes(x=treaty,fill=discrimination_illegal)) 
+g <- g + geom_bar() + scale_fill_manual(labels = c("No", "Yes","NA"), values = c("#355C7D", "#F8B195"), na.value = "grey60")
+
+#add labels to the plot
+g <- g + labs(x="Treaty Status", y="Number of Countries", fill="Have a Law Against \nGender Discrimination?", title = "Distribution of Treaty Status in different countries") + theme(plot.title = element_text(face="bold"))
+g
+```
+
+Part 2:
+
+Most countries signed the treaty in between 2000 and 2004, especially in 2002. According to the bar plot, there is no relationship between the legality of gender discrimination and the year that the country signed the treaty. 
+
+
+```{r}
+#create the plot with "year_of_ratification" as bars and "discrimination_illegal" as an indicator
+#manually recolor the plot
+g2 <- ggplot(data=mydata,mapping = aes(x=year_of_ratification, fill=discrimination_illegal)) + geom_bar()  + scale_fill_manual(labels = c("No", "Yes","NA"), values = c( "grey30","#F8B195" ), na.value ="#355C7D")
+
+#add labels
+g2 <- g2+ labs(x="Year", y="Number of Countries", fill="Have a Law Against \nGender Discrimination?", title = "Year of Ratification and Gender Discrimination") + theme(plot.title = element_text(face="bold"))
+g2
+
+```
+
+
+Part 3:
+
+It's clear that most countries do not have an equal percentage of men and women in government. There was only one country that has more women than men in government. Except for that, seats in government's legislature are dominantly occupied by men no matter the countries signed the treaty ratification or not.
+
+
+```{r}
+g3 <- ggplot(data=mydata,mapping = aes(x=women_in_parliament, fill = treaty)) + geom_histogram(bins=10) +  scale_fill_manual( values = c( "grey40", "#4a6a85", "#ffa56e"))
+g3 <- g3+ labs(x="Percentage of Women in Government", y="Number of Countries", fill="Treaty Status", title = "Distribution of Women in Governments") + theme(plot.title = element_text(face="bold"))
+g3
+```
+
+
+
