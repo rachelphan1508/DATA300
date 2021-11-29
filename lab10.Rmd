@@ -1,0 +1,57 @@
+---
+title: "DATA300_Lab10_HanhPhan"
+output: html_document
+---
+```{r}
+library(network)
+library(ggnetwork)
+library(ggplot2)
+library(dplyr)
+library(plyr)
+
+node <- read.csv("dolphin_nodes.csv")
+edge <- read.csv("dolphin_edges.csv")
+
+
+#counts <- ddply(edge, .(edge$from, edge$to, nrow))
+#names(counts) <- c("a", "b", "freq") 
+#counts
+freq2 <- count(edge, 'to')
+freq1 <-count(edge, 'from')
+freq2
+freq1
+
+
+net <- network(x=edge, vertices = node, directed=FALSE)
+
+typeof(net$group)
+
+n <- ggnetwork(net)
+n$group <- as.factor(n$group)
+ggplot(n,aes(x=x,y=y,xend=xend,yend=yend, color = group)) + 
+  theme_void() + geom_nodes( size =2) + 
+  geom_edges(aes(alpha=0.8)) +
+  scale_color_manual(values = c("#F8B195", "grey30", "#355C7D", "green")) + 
+  geom_nodelabel(aes(label=vertex.names, fontface = "bold")) +
+  theme_blank()
+
+
+#+ geom_nodelabel_repel(aes(color=group, label = vertex.names, box.padding = unit(1, "lines"), fontface="bold"))
+#+  geom_nodetext(aes(label=vertex.names, fontface = "bold")) 
+#+ theme(element_text(size =2)) 
+#scale_discrete_manual(aesthetics, values=c("red", "blue", "green", "grey"), breaks = c("1", "2", "3", "4"))
+
+
+
+```
+```{r}
+n
+```
+```{r}
+ggplot(n,aes(x=x,y=y,xend=xend,yend=yend)) + theme_void() + geom_nodes(aes(color = group, size =4)) + geom_edges(aes(alpha=0.6)) +scale_color_manual(values = c("#F8B195", "grey30", "#355C7D", "green")) +  geom_nodelabel(aes(label=vertex.names))
+```
+
+
+Visualize the dolphin social network
+- The dolphins
+- The connections

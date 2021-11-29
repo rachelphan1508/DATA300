@@ -1,0 +1,56 @@
+---
+title: "DATA300_Lab7_HanhPhan"
+output: html_document
+---
+
+Part 1:
+College_Grad is the variable with higher level of support for legalization. Female, Age, and Conservative are associated with lower levels of support for legalization. College_Grad is not statistically significant; other effects are statistically significant.
+```{r}
+library(ggplot2)
+
+mydata <- read.csv("legalization_survey.csv")
+#create a model for binary outcomes
+m <- glm(legalize ~ age + conservative + female + college_grad,data=mydata, family="binomial",na.action = "na.exclude")
+
+#get the confidence intervals
+ci <- confint(m)
+
+#create a data frame for the fit values and CI values
+results <- data.frame(ci)
+results$Estimate <- m$coefficients
+results$List <- c("Intercept","Age","Conservative","Female","College Grad")
+colnames(results) <- c("lwr","upr","Estimate","List")
+
+#remove the Intercept line
+results <- results[-c(1),]
+
+
+#make a plot from that data frame
+G <- ggplot(results,aes(y=List, x=Estimate)) +geom_point() + geom_errorbar(aes(xmin=lwr,xmax=upr),width=.4)
+G <- G + labs(title="The Estimated Effect of Different Elements towards Marijuana Legalization", y="")+theme(plot.title = element_text(face="bold",size =12)) 
+G
+
+```
+
+
+Part 2:
+Age has a significant effect on the predicted probability of supporting legalization. The younger people are, the more they support marijuana legalization. Also, the plot implies that people who are non-conservative are more supportive of marijuana than those who are conservative.
+```{r}
+#create a new dataset where age varies from the lowest age value in the survey to the highest value. Conservative varies between 0 and 1, female is set to 1 and college_grad os set to 0
+data2 <- expand.grid(age=seq(min(mydata$age,na.rm=T),max(mydata$age,na.rm=T)),conservative=c(0,1),female=1,college_grad=0)
+
+#generate predictions with 95% confidence intervals
+predictions <- predict(m,newdata=data2,type="response",se.fit=T)
+predictions <- data.frame(fit=predictions$fit, lwr=predictions$fit-1.96*predictions$se.fit, upr=predictions$fit+1.96*predictions$se.fit)
+
+#combine our new data set with predictions
+predictions <- cbind(data2,predictions)
+
+#plot the predictions and add the 95% CI to the plot
+G2 <- ggplot(predictions,aes(x=age,y=fit,group=conservative,fill=as.factor(conservative))) + geom_line() + geom_ribbon(aes(x=age,y=fit,ymin=lwr,ymax=upr),alpha=.4) + scale_fill_manual(labels = c("Non-Conservative", "Conservative"), values = c("#4682B4", "#CD3700"))
+
+#adjust the label names
+G2 <- G2 + labs (title="Predicted probability of supporting marijuana legalization across \nthe range of age, for both conservatives and non-conservatives", x="Age", y="Probability of Legalization",fill="Politically conservative?") +theme(plot.title = element_text(face="bold"))
+G2
+```
+

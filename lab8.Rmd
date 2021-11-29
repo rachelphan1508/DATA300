@@ -1,0 +1,64 @@
+---
+title: "DATA300_Lab8_HanhPhan"
+output: html_document
+---
+
+Part 1: Carbon Emissions per Capita
+I choose to color a country  with high carbon emission per capita red because it's polluted & against green. I color the panel background blue because it's similar to the color of water.
+
+```{r}
+library(maps)
+library(ggplot2)
+library(dplyr)
+mydata <- read.csv("emissions_world_2019.csv")
+
+#fix the country names in our data that aren't similar to the names in map_data
+mydata$country <- ifelse(mydata$country=="United States","USA",mydata$country)
+mydata$country <- ifelse(mydata$country=="United Kingdom","UK",mydata$country)
+mydata$country <- ifelse(mydata$country=="Cote d'Ivoire","Ivory Coast",mydata$country)
+mydata$country <- ifelse(mydata$country=="Congo","Republic of Congo",mydata$country)
+mydata$country <- ifelse(mydata$country=="Democratic Republic of Congo","Democratic Republic of the Congo",mydata$country)
+mydata$country <- ifelse(mydata$country=="Czechia","Czech Republic",mydata$country)
+
+#calculate the CO2 per capita
+mydata$co2percap <- mydata$co2/mydata$population
+
+#join the two datasets
+world_map <- map_data("world")
+world_map <- left_join(world_map,mydata,by=c("region"="country"))
+
+#make the plot
+map1 <- ggplot(world_map,aes(x=long,y=lat,group=group)) + geom_polygon(aes(fill=co2percap),color="black",size=.1) + scale_fill_gradient2(low ="#fcf3e6", mid="#f5d4a6",  high = "#a30c02",midpoint=5, space = "Lab", na.value = "grey70", guide = "colourbar", aesthetics = "fill") + theme_void()
+
+#add names for title and legend
+map1 <- map1 + labs (title="Map of Carbon Emissions per Capita",x=" ",y=" ", fill="CO2 per capita") +theme(plot.title = element_text(face="bold",hjust=0.5)) + theme(legend.position = "bottom") + theme(panel.background = element_rect(fill = "#aec8eb"))
+map1
+
+```
+
+
+
+Part 2: Energy Sources
+
+I tried to choose the color of energy sources based on the color that relates to the energy's colors (renewable, gas). But not all of them had a representative color in real life, so I chose what I think would look like instead. I color the panel background blue because it's similar to the color of water. I also got rid if the legend's name because I think the title says it all.
+
+
+```{r}
+#make the plot
+map2 <- ggplot(world_map,aes(x=long,y=lat,group=group)) + geom_polygon(aes(fill=as.factor(source)),color="black",size=.1)  + theme_void()
+
+#adjust the color
+map2 <- map2 +scale_fill_manual( values = c( "#36454f", "#FDFF46", "#B22222", "#A17917", "#0ee31f"),na.value = "grey70") 
+
+#add title and theme
+map2 <- map2 + labs (title="Most Popular Energy Sources",x=" ",y=" ",fill="")
+map2 <- map2 + theme(
+  plot.title = element_text(face="bold",hjust=0.5),
+  legend.position = "bottom", 
+  panel.background = element_rect(fill = "#aec8eb"), 
+  legend.box="horizontal",
+  legend.key.size = unit(0.5,"cm"),
+  )
+map2
+```
+
